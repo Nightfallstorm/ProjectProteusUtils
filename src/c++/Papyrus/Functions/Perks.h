@@ -28,9 +28,18 @@ namespace Papyrus::Perk
 		if (!a_actor) {
 			return result;
 		}
-
-		if (const auto player = RE::PlayerCharacter::GetSingleton(); player == a_actor) {
-			if (const auto perkArray = player->GetPlayerRuntimeData().addedPerks; !perkArray.empty()) {
+		logger::info("CRASHTEST: Grabbing player singleton");
+		RE::PlayerCharacter* player = RE::PlayerCharacter::GetSingleton();
+		logger::info("CRASHTEST: Checking if player singleton is actor in question");
+		if (player == a_actor) {
+			logger::info("CRASHTEST: Grabbing Player Data");
+			const auto playerData = player->GetPlayerRuntimeData(); // This line is where it errors
+			logger::info("CRASHTEST: Grabbing Player Perks");
+			auto perkArray = playerData.addedPerks;
+			//auto perkArray = player->GetPlayerRuntimeData().addedPerks; // Comment `playerData` and use this perkArray to stop compile error
+			logger::info("CRASHTEST: Checking if perks empty");
+			if (!perkArray.empty()) {
+				logger::info("CRASHTEST: Looping through perks");
 				for (const auto perkData : perkArray) {
 					if (const auto perk = perkData->perk; perk) {
 						result.emplace_back(perk);
